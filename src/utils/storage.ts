@@ -16,7 +16,7 @@ export function saveUser(user: UserWithoutPassword): void {
 
 /* Récupère l'utilisateur dans le localStorage */
 
-export function gerUser(): UserWithoutPassword | null {
+export function getUser(): UserWithoutPassword | null {
     try {
         const userStr = localStorage.getItem(STORAGE_KEYS.USER);
         if(!userStr) return null;
