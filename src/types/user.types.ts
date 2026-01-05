@@ -9,4 +9,4 @@ export interface User {
   }
   
   // Type pour l'utilisateur sans le mot de passe (sécurité)
-  export interface UserWithoutPassword extends Omit<User, 'password'> {}
+  export type UserWithoutPassword = Omit<User, 'password'>;

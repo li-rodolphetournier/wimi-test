@@ -1,4 +1,5 @@
-import { useEffect, ReactNode } from 'react';
+import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { useAuthStore } from './store/authStore';

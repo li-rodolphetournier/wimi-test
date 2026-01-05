@@ -1,4 +1,5 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:3001',
@@ -13,8 +14,8 @@ api.interceptors.request.use(
     const user = localStorage.getItem('user');
     if (user) {
       try {
-        const userData = JSON.parse(user);
         // Si le backend nécessite un token, l'ajouter ici
+        // const userData = JSON.parse(user);
         // config.headers.Authorization = `Bearer ${userData.token}`;
       } catch (error) {
         console.error('Erreur lors de la lecture des données utilisateur:', error);

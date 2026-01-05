@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserWithoutPassword } from '@/types';
+import type { UserWithoutPassword } from '@/types';
 import { authService } from '@/services/auth.service';
 import { saveUser, getUser, removeUser } from '@/utils/storage';
 
