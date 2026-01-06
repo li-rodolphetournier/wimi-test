@@ -3395,7 +3395,7 @@
       "id": "330",
       "title": "Write tests for file upload module",
       "description": "This task requires careful attention to detail and coordination with the team",
-      "completed": false,
+      "completed": true,
       "todoListId": 7,
       "priority": "high",
       "dueDate": "2024-03-21",
@@ -3465,7 +3465,7 @@
       "id": "337",
       "title": "Review and update file upload module",
       "description": "User-facing feature that will improve the overall experience",
-      "completed": false,
+      "completed": true,
       "todoListId": 7,
       "priority": "high",
       "dueDate": "2024-03-04",
@@ -3495,7 +3495,7 @@
       "id": "340",
       "title": "Refactor notification service",
       "description": "Technical debt that should be addressed when time permits",
-      "completed": false,
+      "completed": true,
       "todoListId": 7,
       "priority": "high",
       "dueDate": "2024-02-23",
@@ -3515,7 +3515,7 @@
       "id": "342",
       "title": "Document payment gateway",
       "description": "Documentation update for better onboarding",
-      "completed": false,
+      "completed": true,
       "todoListId": 7,
       "priority": "high",
       "dueDate": "2024-02-10",
@@ -3575,7 +3575,7 @@
       "id": "348",
       "title": "Create prototype of API endpoints",
       "description": "Technical debt that should be addressed when time permits",
-      "completed": false,
+      "completed": true,
       "todoListId": 7,
       "priority": "high",
       "dueDate": "2024-02-03",
@@ -5100,6 +5100,96 @@
       "priority": "low",
       "dueDate": "2024-03-15",
       "createdAt": "2024-01-24T09:43:00.000Z"
+    },
+    {
+      "id": "ac2d",
+      "title": "Tâche E2E - 1767699074623",
+      "description": "Cette tâche a été créée par un test E2E automatisé",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "high",
+      "dueDate": "2026-01-07"
+    },
+    {
+      "id": "861c",
+      "title": "Tâche E2E - 1767699102854",
+      "description": "Cette tâche a été créée par un test E2E automatisé",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "high",
+      "dueDate": "2026-01-07"
+    },
+    {
+      "id": "f60d",
+      "title": "Tâche E2E - 1767699131707",
+      "description": "Cette tâche a été créée par un test E2E automatisé",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "high",
+      "dueDate": "2026-01-07"
+    },
+    {
+      "id": "5ed8",
+      "title": "test",
+      "description": "test",
+      "completed": false,
+      "todoListId": 7,
+      "priority": "high",
+      "dueDate": "2026-01-07"
+    },
+    {
+      "id": "acb2",
+      "title": "Test E2E - 1767699186930",
+      "description": "Description de test",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "medium",
+      "dueDate": ""
+    },
+    {
+      "id": "1bf6",
+      "title": "Test E2E - 1767699203512",
+      "description": "Description de test",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "medium",
+      "dueDate": ""
+    },
+    {
+      "id": "ea47",
+      "title": "Test E2E - 1767699302972",
+      "description": "Description de test",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "medium",
+      "dueDate": ""
+    },
+    {
+      "id": "ccb6",
+      "title": "Test E2E - 1767699385475",
+      "description": "Description de test",
+      "completed": false,
+      "todoListId": 10,
+      "priority": "medium",
+      "dueDate": ""
+    },
+    {
+      "id": "1da4",
+      "title": "test",
+      "description": "test",
+      "completed": false,
+      "todoListId": 7,
+      "priority": "high",
+      "dueDate": "2026-01-08"
+    },
+    {
+      "id": "4f64",
+      "title": "zrtsgdfg",
+      "description": "sfgsdfgsf",
+      "completed": false,
+      "todoListId": 7,
+      "priority": "medium",
+      "dueDate": "2026-01-08"
     }
   ]
 }

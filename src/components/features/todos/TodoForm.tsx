@@ -18,13 +18,9 @@ interface TodoFormData {
   description: string;
   priority: 'low' | 'medium' | 'high';
   dueDate: string;
-  todoListId: string; // String pour le select, converti en number
+  todoListId: string;
 }
 
-/**
- * Composant TodoForm - Formulaire de création de nouvelles tâches
- * Utilise React Hook Form avec validation complète
- */
 export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) {
   const { user } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +33,7 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
     formState: { errors, isValid },
     watch,
   } = useForm<TodoFormData>({
-    mode: 'onChange', // Validation en temps réel
+    mode: 'onChange',
     defaultValues: {
       title: '',
       description: '',
@@ -47,15 +43,12 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
     },
   });
 
-  /**
-   * Validation personnalisée pour la date d'échéance
-   */
   const validateDueDate = (value: string) => {
-    if (!value) return true; // Optionnel
+    if (!value) return true;
 
     const selectedDate = new Date(value);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Minuit pour comparaison
+    today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
       return 'La date d\'échéance ne peut pas être dans le passé';
@@ -64,9 +57,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
     return true;
   };
 
-  /**
-   * Soumission du formulaire
-   */
   const onSubmit = async (data: TodoFormData) => {
     if (!user) return;
 
@@ -83,13 +73,8 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
       };
 
       const newTodo = await todoService.createTodo(todoData);
-
-      // Réinitialiser le formulaire
       reset();
-
-      // Notifier le parent
       onTodoCreated?.(newTodo);
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création de la tâche';
       setSubmitError(errorMessage);
@@ -98,7 +83,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
     }
   };
 
-  // Si pas de listes disponibles
   if (todoLists.length === 0) {
     return (
       <Card className="p-4">
@@ -112,7 +96,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
   return (
     <Card className="p-6">
       <div className="space-y-6">
-        {/* En-tête */}
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Nouvelle tâche</h3>
           <p className="text-sm text-gray-600 mt-1">
@@ -120,7 +103,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
           </p>
         </div>
 
-        {/* Message d'erreur de soumission */}
         {submitError && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center">
@@ -136,9 +118,7 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
           </div>
         )}
 
-        {/* Formulaire */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Titre (requis) */}
           <Input
             label="Titre de la tâche *"
             placeholder="Ex: Finaliser le rapport mensuel"
@@ -156,7 +136,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
             error={errors.title?.message}
           />
 
-          {/* Description (optionnel) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description (optionnel)
@@ -177,7 +156,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
             )}
           </div>
 
-          {/* Liste de destination */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Liste de tâches *
@@ -199,7 +177,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
             )}
           </div>
 
-          {/* Priorité */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Priorité
@@ -218,9 +195,7 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
                     className="sr-only"
                   />
                   <span className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-colors ${
-                    watch('priority') === value
-                      ? color
-                      : 'text-gray-500 bg-gray-100 hover:bg-gray-200'
+                    watch('priority') === value ? color : 'text-gray-500 bg-gray-100 hover:bg-gray-200'
                   }`}>
                     {label}
                   </span>
@@ -229,7 +204,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
             </div>
           </div>
 
-          {/* Date d'échéance (optionnel) */}
           <Input
             label="Date d'échéance (optionnel)"
             type="date"
@@ -239,7 +213,6 @@ export function TodoForm({ todoLists, onTodoCreated, onCancel }: TodoFormProps) 
             error={errors.dueDate?.message}
           />
 
-          {/* Boutons d'action */}
           <div className="flex space-x-3 pt-4">
             <Button
               type="submit"

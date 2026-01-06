@@ -9,54 +9,35 @@ interface TodoItemProps {
   onDelete?: (todoId: number) => void;
 }
 
-/**
- * Composant TodoItem - Affiche une tâche individuelle avec checkbox interactive
- * Implémente l'optimistic UI pour les changements d'état
- */
 export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [optimisticCompleted, setOptimisticCompleted] = useState(todo.completed);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Gère le changement d'état de complétion avec optimistic UI
-   */
   const handleToggleComplete = async () => {
     const newCompletedState = !optimisticCompleted;
 
-    // Mise à jour optimiste immédiate
     setOptimisticCompleted(newCompletedState);
     setIsUpdating(true);
     setError(null);
 
     try {
-      // Appel API pour persister le changement
       const updatedTodo = await todoService.updateTodo(todo.id, {
         completed: newCompletedState,
       });
-
-      // Mise à jour du parent avec les données serveur
       onUpdate?.(updatedTodo);
     } catch (err) {
-      // En cas d'erreur, rollback de l'état optimiste
       setOptimisticCompleted(!newCompletedState);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise à jour';
       setError(errorMessage);
-
-      // Afficher l'erreur pendant 3 secondes puis la masquer
       setTimeout(() => setError(null), 3000);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  /**
-   * Gère la suppression de la tâche
-   */
   const handleDelete = async () => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-      return;
-    }
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) return;
 
     try {
       await todoService.deleteTodo(todo.id);
@@ -68,9 +49,6 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
     }
   };
 
-  /**
-   * Formate la date d'échéance avec indication de proximité
-   */
   const formatDueDate = (dueDate: string) => {
     const due = new Date(dueDate);
     const now = new Date();
@@ -102,7 +80,6 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
 
   return (
     <div className="group relative">
-      {/* Message d'erreur temporaire */}
       {error && (
         <div className="absolute -top-2 left-0 right-0 z-10 bg-red-50 border border-red-200 rounded px-2 py-1 text-xs text-red-700 animate-fade-in">
           {error}
@@ -110,7 +87,6 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
       )}
 
       <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-        {/* Checkbox interactive */}
         <Checkbox
           checked={optimisticCompleted}
           isLoading={isUpdating}
@@ -118,75 +94,46 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
           className="mt-0.5"
         />
 
-        {/* Contenu de la tâche */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              {/* Titre */}
               <h4 className={`text-sm font-medium truncate ${
-                optimisticCompleted
-                  ? 'line-through text-gray-500'
-                  : 'text-gray-900'
+                optimisticCompleted ? 'line-through text-gray-500' : 'text-gray-900'
               }`}>
                 {todo.title}
               </h4>
 
-              {/* Description */}
               {todo.description && (
                 <p className={`text-xs mt-1 ${
-                  optimisticCompleted
-                    ? 'line-through text-gray-400'
-                    : 'text-gray-600'
+                  optimisticCompleted ? 'line-through text-gray-400' : 'text-gray-600'
                 }`}>
                   {todo.description}
                 </p>
               )}
 
-              {/* Métadonnées */}
               <div className="flex items-center space-x-3 mt-2">
-                {/* Priorité */}
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                  todo.priority === 'high'
-                    ? 'bg-red-100 text-red-800'
-                    : todo.priority === 'medium'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-green-100 text-green-800'
+                  todo.priority === 'high' ? 'bg-red-100 text-red-800' :
+                  todo.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
                 }`}>
                   {todo.priority === 'high' ? 'Haute' : todo.priority === 'medium' ? 'Moyenne' : 'Basse'}
                 </span>
 
-                {/* Date d'échéance */}
                 {todo.dueDate && (
                   <span className={`text-xs ${formatDueDate(todo.dueDate).colorClass}`}>
                     {formatDueDate(todo.dueDate).text}
                   </span>
                 )}
 
-                {/* Date de création */}
                 <span className="text-xs text-gray-400">
                   Créé le {new Date(todo.createdAt).toLocaleDateString('fr-FR')}
                 </span>
               </div>
             </div>
 
-            {/* Menu d'actions (visible au hover) */}
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
               <div className="flex space-x-1">
-                {/* Bouton modifier (placeholder pour plus tard) */}
-                <button
-                  className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 transition-colors"
-                  title="Modifier"
-                  onClick={() => {
-                    // TODO: Implémenter l'édition
-                    console.log('Modifier todo:', todo.id);
-                  }}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-
-                {/* Bouton supprimer */}
                 <button
                   className="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors"
                   title="Supprimer"

@@ -8,32 +8,15 @@ const api = axios.create({
   },
 });
 
-// Intercepteur de requête : ajoute le token d'authentification si disponible
 api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      try {
-        // Si le backend nécessite un token, l'ajouter ici
-        // const userData = JSON.parse(user);
-        // config.headers.Authorization = `Bearer ${userData.token}`;
-      } catch (error) {
-        console.error('Erreur lors de la lecture des données utilisateur:', error);
-      }
-    }
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
+  (config: InternalAxiosRequestConfig) => config,
+  (error: AxiosError) => Promise.reject(error)
 );
 
-// Intercepteur de réponse : gestion globale des erreurs
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response) {
-      // Erreur avec réponse du serveur
       const status = error.response.status;
       const message = (error.response.data as { message?: string })?.message || error.message;
 
@@ -54,10 +37,8 @@ api.interceptors.response.use(
           console.error(`Erreur ${status}:`, message);
       }
     } else if (error.request) {
-      // Requête envoyée mais pas de réponse
       console.error('Pas de réponse du serveur. Vérifiez que le serveur mock est démarré sur http://localhost:3001');
     } else {
-      // Erreur lors de la configuration de la requête
       console.error('Erreur de configuration:', error.message);
     }
 

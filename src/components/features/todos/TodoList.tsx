@@ -8,24 +8,18 @@ import { TodoItem } from './TodoItem';
 import { TodoForm } from './TodoForm';
 import type { TodoList, Todo } from '@/types';
 
-/**
- * Interface pour grouper une liste avec ses todos
- */
 interface TodoListWithTodos extends TodoList {
   todos: Todo[];
 }
 
-/**
- * Composant TodoList - Affiche les listes de tâches de l'utilisateur avec leurs todos
- */
 export function TodoList() {
   const { user } = useAuthStore();
   const [listsWithTodos, setListsWithTodos] = useState<TodoListWithTodos[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Chargement initial des données
   useEffect(() => {
     if (!user) return;
 
@@ -34,22 +28,15 @@ export function TodoList() {
         setIsLoading(true);
         setError(null);
 
-        // Récupérer les listes de l'utilisateur
         const lists = await todoListService.getTodoListsByUserId(user.id);
 
-        // Pour chaque liste, récupérer ses todos
         const listsWithTodosPromises = lists.map(async (list): Promise<TodoListWithTodos> => {
           const todos = await todoService.getTodosByListId(list.id);
-          return {
-            ...list,
-            todos,
-          };
+          return { ...list, todos };
         });
 
-        // Attendre que toutes les requêtes soient terminées
         const listsWithTodosData = await Promise.all(listsWithTodosPromises);
         setListsWithTodos(listsWithTodosData);
-
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des données';
         setError(errorMessage);
@@ -61,9 +48,6 @@ export function TodoList() {
     loadData();
   }, [user]);
 
-  /**
-   * Gère la mise à jour d'un todo dans une liste
-   */
   const handleTodoUpdate = (listId: number, updatedTodo: Todo) => {
     setListsWithTodos(prevLists =>
       prevLists.map(list =>
@@ -79,9 +63,6 @@ export function TodoList() {
     );
   };
 
-  /**
-   * Gère la suppression d'un todo d'une liste
-   */
   const handleTodoDelete = (listId: number, todoId: number) => {
     setListsWithTodos(prevLists =>
       prevLists.map(list =>
@@ -95,24 +76,67 @@ export function TodoList() {
     );
   };
 
-  /**
-   * Gère la création d'une nouvelle tâche
-   */
   const handleTodoCreated = (newTodo: Todo) => {
-    setListsWithTodos(prevLists =>
-      prevLists.map(list =>
-        list.id === newTodo.todoListId
-          ? {
-              ...list,
-              todos: [newTodo, ...list.todos] // Ajouter au début de la liste
-            }
-          : list
-      )
-    );
-    setShowCreateForm(false); // Masquer le formulaire après création
+    console.log('🎉 Nouvelle tâche créée:', newTodo);
+    
+    setListsWithTodos(prevLists => {
+      const updatedLists = prevLists.map(list => {
+        if (list.id === newTodo.todoListId) {
+          const updatedTodos = [newTodo, ...list.todos];
+          
+          // Trier les todos (priorité puis date)
+          const sortedTodos = updatedTodos.sort((a, b) => {
+            const priorityOrder: Record<'low' | 'medium' | 'high', number> = {
+              high: 3,
+              medium: 2,
+              low: 1,
+            };
+            const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+            
+            if (priorityDiff !== 0) return priorityDiff;
+            
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
+          
+          console.log('✅ Liste mise à jour:', list.title, 'Total todos:', sortedTodos.length);
+          
+          return { ...list, todos: sortedTodos };
+        }
+        return list;
+      });
+      
+      // Remonter la liste qui vient de recevoir la nouvelle tâche en premier
+      const sortedLists = [...updatedLists].sort((a, b) => {
+        // La liste qui contient la nouvelle tâche passe en premier
+        if (a.id === newTodo.todoListId) return -1;
+        if (b.id === newTodo.todoListId) return 1;
+        // Sinon garder l'ordre par date de création décroissante
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+      
+      return sortedLists;
+    });
+    
+    setShowCreateForm(false);
+    
+    // Afficher un message de succès
+    setSuccessMessage(`✅ Tâche "${newTodo.title}" créée avec succès !`);
+    setTimeout(() => setSuccessMessage(null), 3000);
+    
+    // Scroller vers la liste concernée
+    setTimeout(() => {
+      const listElement = document.getElementById(`list-${newTodo.todoListId}`);
+      if (listElement) {
+        listElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Ajouter un effet visuel temporaire
+        listElement.classList.add('ring-2', 'ring-green-400', 'ring-offset-2');
+        setTimeout(() => {
+          listElement.classList.remove('ring-2', 'ring-green-400', 'ring-offset-2');
+        }, 2000);
+      }
+    }, 100);
   };
 
-  // Gestion du chargement
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -128,7 +152,6 @@ export function TodoList() {
     );
   }
 
-  // Gestion des erreurs
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -139,19 +162,14 @@ export function TodoList() {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">
-              Erreur de chargement
-            </h3>
-            <p className="text-sm text-red-700 mt-1">
-              {error}
-            </p>
+            <h3 className="text-sm font-medium text-red-800">Erreur de chargement</h3>
+            <p className="text-sm text-red-700 mt-1">{error}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Aucun utilisateur connecté
   if (!user) {
     return (
       <div className="text-center py-8">
@@ -160,7 +178,6 @@ export function TodoList() {
     );
   }
 
-  // Aucune liste
   if (listsWithTodos.length === 0) {
     return (
       <div className="text-center py-8">
@@ -169,12 +186,8 @@ export function TodoList() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Aucune liste de tâches
-        </h3>
-        <p className="text-gray-500">
-          Vous n'avez pas encore de listes de tâches. Créez-en une pour commencer !
-        </p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune liste de tâches</h3>
+        <p className="text-gray-500">Vous n'avez pas encore de listes de tâches. Créez-en une pour commencer !</p>
       </div>
     );
   }
@@ -191,15 +204,26 @@ export function TodoList() {
           </p>
         </div>
 
-        <Button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="shrink-0"
-        >
+        <Button onClick={() => setShowCreateForm(!showCreateForm)} className="shrink-0">
           {showCreateForm ? 'Annuler' : '+ Nouvelle tâche'}
         </Button>
       </div>
 
-      {/* Formulaire de création */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 animate-fade-in">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-green-800">{successMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showCreateForm && (
         <TodoForm
           todoLists={listsWithTodos}
@@ -210,29 +234,26 @@ export function TodoList() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {listsWithTodos.map((list) => (
-          <Card key={list.id} className="h-fit">
-            {/* En-tête de la liste */}
+          <Card 
+            key={list.id} 
+            className="h-fit transition-all duration-300"
+            id={`list-${list.id}`}
+          >
             <div className="flex items-center space-x-3 mb-4">
               <div
                 className="w-4 h-4 rounded-full flex-shrink-0"
                 style={{ backgroundColor: list.color }}
               />
-              <h3 className="font-semibold text-gray-900 truncate">
-                {list.title}
-              </h3>
+              <h3 className="font-semibold text-gray-900 truncate">{list.title}</h3>
             </div>
 
-            {/* Statistiques de la liste */}
             <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
               <span>
                 {list.todos.filter(todo => todo.completed).length}/{list.todos.length} terminées
               </span>
-              <span>
-                {new Date(list.createdAt).toLocaleDateString('fr-FR')}
-              </span>
+              <span>{new Date(list.createdAt).toLocaleDateString('fr-FR')}</span>
             </div>
 
-            {/* Liste des todos */}
             <div className="space-y-1">
               {list.todos.length === 0 ? (
                 <p className="text-sm text-gray-400 italic text-center py-4">
@@ -249,7 +270,6 @@ export function TodoList() {
                 ))
               )}
 
-              {/* Indicateur si plus de 5 todos */}
               {list.todos.length > 5 && (
                 <p className="text-xs text-gray-400 text-center py-2 border-t border-gray-100 pt-2 mt-2">
                   +{list.todos.length - 5} autres tâches...

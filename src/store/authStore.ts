@@ -15,19 +15,14 @@ interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
-  initialize: () => void; // Pour restaurer la session au démarrage
+  initialize: () => void;
 }
 
 type AuthStore = AuthState & AuthActions;
 
-/**
- * Store Zustand pour la gestion de l'authentification
- * Utilise le middleware persist pour sauvegarder dans localStorage
- */
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
-
       user: null,
       isAuthenticated: false,
       isLoading: false,
@@ -37,7 +32,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         try {
           const user = await authService.login({ email, password });
-          saveUser(user); // Sauvegarde dans localStorage
+          saveUser(user);
           set({
             user,
             isAuthenticated: true,
@@ -55,7 +50,6 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-
       logout: () => {
         removeUser();
         set({
@@ -65,24 +59,18 @@ export const useAuthStore = create<AuthStore>()(
         });
       },
 
-      clearError: () => {
-        set({ error: null });
-      },
+      clearError: () => set({ error: null }),
 
-      // Initialisation de la session depuis le localStorage au démarrage
       initialize: () => {
         const user = getUser();
         if (user) {
-          set({
-            user,
-            isAuthenticated: true,
-          });
+          set({ user, isAuthenticated: true });
         }
       },
     }),
     {
-      name: 'auth-storage', // Clé dans localStorage
-      partialize: (state) => ({ user: state.user }), // Ne persiste que l'utilisateur
+      name: 'auth-storage',
+      partialize: (state) => ({ user: state.user }),
     }
   )
 );

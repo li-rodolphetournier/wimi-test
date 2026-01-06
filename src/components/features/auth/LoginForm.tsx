@@ -10,18 +10,12 @@ interface LoginFormData {
   password: string;
 }
 
-/**
- * Formulaire de connexion avec validation React Hook Form
- */
 export function LoginForm() {
   const navigate = useNavigate();
   const { login, isLoading, error, isAuthenticated, clearError } = useAuthStore();
 
-  // Redirige vers le dashboard si déjà authentifié
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
+    if (isAuthenticated) navigate('/dashboard');
   }, [isAuthenticated, navigate]);
 
   const {
@@ -31,9 +25,8 @@ export function LoginForm() {
   } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
-    clearError(); // Efface les erreurs précédentes
+    clearError();
     await login(data.email, data.password);
-    // La redirection se fera via le useEffect si login réussit
   };
 
   return (
@@ -49,6 +42,7 @@ export function LoginForm() {
       <Input
         label="Email"
         type="email"
+        placeholder="exemple@email.com"
         {...register('email', {
           required: 'L\'email est requis',
           pattern: {
@@ -62,6 +56,7 @@ export function LoginForm() {
       <Input
         label="Mot de passe"
         type="password"
+        placeholder="Votre mot de passe"
         {...register('password', {
           required: 'Le mot de passe est requis',
           minLength: {

@@ -7,15 +7,11 @@ interface LoginCredentials {
 }
 
 export const authService = {
-
   async login(credentials: LoginCredentials): Promise<UserWithoutPassword> {
     const { email, password } = credentials;
 
     const response = await api.get<User[]>('/users', {
-      params: {
-        email,
-        password,
-      },
+      params: { email, password },
     });
 
     if (!response.data || response.data.length === 0) {
@@ -23,9 +19,8 @@ export const authService = {
     }
 
     const user = response.data[0];
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user;
+    
     return userWithoutPassword;
   },
 };
