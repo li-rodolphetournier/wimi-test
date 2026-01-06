@@ -38,7 +38,7 @@ export function TodoList() {
         const lists = await todoListService.getTodoListsByUserId(user.id);
 
         // Pour chaque liste, récupérer ses todos
-        const listsWithTodosPromises = lists.map(async (list) => {
+        const listsWithTodosPromises = lists.map(async (list): Promise<TodoListWithTodos> => {
           const todos = await todoService.getTodosByListId(list.id);
           return {
             ...list,

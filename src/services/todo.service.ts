@@ -30,9 +30,9 @@ export const todoService = {
     // Retourne les tâches triées par priorité puis par date de création
     return response.data.sort((a, b) => {
       // Ordre de priorité : high > medium > low
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      const priorityOrder: Record<'low' | 'medium' | 'high', number> = { high: 3, medium: 2, low: 1 };
       const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
-      
+
       if (priorityDiff !== 0) {
         return priorityDiff;
       }
