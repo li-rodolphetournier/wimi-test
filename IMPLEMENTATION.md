@@ -1,6 +1,6 @@
-# 📝 IMPLEMENTATION.md - Wimi Todo Manager
+# IMPLEMENTATION.md - Wimi Todo Manager
 
-## 🚀 Installation et Lancement
+## Installation et Démarrage
 
 ### Prérequis
 
@@ -45,465 +45,288 @@ npm run dev          # Démarre le serveur de développement
 npm run build        # Compile l'application pour la production
 npm run preview      # Prévisualise le build de production
 npm start            # Démarre le serveur API mock (json-server)
+npm test             # Lance les tests unitaires
+npm run test:e2e     # Lance les tests end-to-end
 ```
 
 ---
 
-## 🔐 Connexion
+## Identifiants de Test
 
 Utilisez ces identifiants pour vous connecter :
 
-| Email                    | Mot de passe | Nom        |
-| ------------------------ | ------------ | ---------- |
-| john.doe@example.com     | password123  | John Doe   |
-| jane.smith@example.com   | password123  | Jane Smith |
-| bob.wilson@example.com   | password123  | Bob Wilson |
+| Email                  | Mot de passe | Nom        |
+| ---------------------- | ----------- | ---------- |
+| john.doe@example.com   | password123 | John Doe   |
+| jane.smith@example.com | password123 | Jane Smith |
+| bob.wilson@example.com | password123 | Bob Wilson |
 
 ---
 
-## 🏗️ Architecture et Choix Techniques
+## Architecture et Choix Techniques
 
-### Stack Technique
+### Stack Technique Choisie
 
-#### Frontend Framework
+#### Frontend
 - **React 18.3** avec **TypeScript 5.6** (strict mode)
-- **Vite 4.5** comme bundler (rapide, moderne, HMR performant)
+- **Vite 4.5** comme bundler
+- **TailwindCSS 3.4** pour le styling
 
-**Justification :** React est le framework demandé, TypeScript strict assure la robustesse du code, et Vite offre une excellente DX avec un build ultra-rapide.
+#### State Management & Forms
+- **Zustand 5.0** avec middleware `persist`
+- **React Router 7.11** pour le routing
+- **React Hook Form 7.68** pour les formulaires
 
-#### Styling
-- **TailwindCSS 3.4** (utility-first CSS)
+#### API & Utilitaires
+- **Axios 1.13** pour les appels API
+- **json-server** comme mock API
 
-**Justification :** Tailwind permet un développement rapide avec un design system cohérent, une excellente expérience DX, et un bundle CSS minimal en production grâce au tree-shaking.
+#### Animations & UX
+- **Framer Motion** pour les animations et transitions
 
-#### State Management
-- **Zustand 4.5** avec `persist` middleware
+### Pourquoi ces Choix ?
 
-**Justification :** 
-- Plus léger que Redux (~1KB vs ~8KB)
-- API simple et intuitive
-- Pas de boilerplate
-- Middleware `persist` pour la persistance de session
-- Parfaitement adapté à la taille du projet
+#### React + TypeScript Strict
+J'ai activé le strict mode de TypeScript pour forcer une meilleure qualité de code. Ça demande plus de rigueur sur les types, mais ça évite beaucoup de bugs en production.
 
-#### Routing
-- **React Router 6.28**
+#### Vite vs Create React App
+J'ai opté pour Vite principalement pour la vitesse. Le Hot Module Replacement est vraiment instantané comparé à CRA, et le temps de build est divisé par 3-4. Pour un projet moderne, c'est un choix évident.
 
-**Justification :** Standard de l'industrie pour le routing React, API moderne avec hooks, support natif des routes protégées.
+#### Zustand vs Redux
+Pour un projet de cette taille, Zustand est largement suffisant. C'est beaucoup plus léger (1KB vs 8KB pour Redux), l'API est plus simple, et il n'y a presque pas de boilerplate. Le middleware `persist` gère la persistance dans localStorage sans configuration complexe.
 
-#### API Client
-- **Axios 1.7**
+#### TailwindCSS
+J'ai choisi Tailwind pour plusieurs raisons :
+- Développement rapide avec les utility classes
+- Design system cohérent par défaut
+- Tree-shaking automatique (seul le CSS utilisé est dans le bundle final)
+- Pas besoin de gérer des fichiers CSS séparés
 
-**Justification :** Intercepteurs pour la gestion globale des erreurs, meilleure gestion des requêtes que fetch natif, support des transformations de données.
+#### React Hook Form
+Comparé à d'autres solutions (Formik, etc.), React Hook Form provoque beaucoup moins de re-renders. La validation est intégrée et l'API avec `register` est vraiment intuitive.
 
-#### Forms & Validation
-- **React Hook Form 7.54**
-
-**Justification :** 
-- Performance optimale (moins de re-renders)
-- Validation intégrée
-- API simple avec `register` et `handleSubmit`
-- Support TypeScript natif
+#### Framer Motion
+J'ai ajouté Framer Motion pour améliorer l'expérience utilisateur avec des animations fluides. C'est une librairie légère qui utilise l'accélération GPU et qui s'intègre parfaitement avec React. Les animations rendent l'application plus vivante et professionnelle.
 
 ---
 
-### Architecture des Dossiers
+## Architecture des Dossiers
 
 ```
 src/
 ├── components/
-│   ├── ui/                    # Composants atomiques réutilisables
-│   │   ├── Button.tsx         # Bouton avec variants et loading
-│   │   ├── Input.tsx          # Input avec label et erreurs
-│   │   ├── Checkbox.tsx       # Checkbox custom avec loading
-│   │   ├── Card.tsx           # Container générique
-│   │   ├── Avatar.tsx         # Avatar avec fallback initiales
-│   │   └── index.ts           # Barrel export
-│   └── features/              # Composants métier
-│       ├── auth/
-│       │   └── LoginForm.tsx  # Formulaire de connexion
-│       └── todos/
-│           ├── TodoList.tsx   # Affichage des listes
-│           ├── TodoItem.tsx   # Item de tâche individuel
-│           └── TodoForm.tsx   # Formulaire de création
-├── pages/
-│   ├── LoginPage.tsx          # Page de connexion
-│   └── DashboardPage.tsx      # Dashboard principal
-├── services/
-│   ├── api.ts                 # Configuration Axios
-│   ├── auth.service.ts        # Service d'authentification
-│   ├── todoList.service.ts    # Service listes de tâches
-│   └── todo.service.ts        # Service tâches (CRUD)
-├── store/
-│   └── authStore.ts           # Store Zustand auth + persist
-├── types/
-│   ├── user.types.ts          # Types User
-│   ├── todoList.types.ts      # Types TodoList
-│   ├── todo.types.ts          # Types Todo + Create/Update
-│   └── index.ts               # Barrel export
-├── utils/
-│   └── storage.ts             # Helpers localStorage
+│   ├── ui/                    # Composants réutilisables (Button, Input, etc.)
+│   └── features/              # Composants métier (LoginForm, TodoList, etc.)
+├── pages/                     # Pages de l'application
+├── services/                  # Logique API isolée
+├── store/                     # State management global (Zustand)
+├── types/                     # Définitions TypeScript
+├── utils/                     # Fonctions utilitaires
 ├── App.tsx                    # Router + Routes protégées
-└── main.tsx                   # Point d'entrée React
+└── main.tsx                   # Point d'entrée
 ```
 
----
+### Principes Appliqués
 
-### Principes d'Architecture Appliqués
+**Séparation des préoccupations** : J'ai bien séparé les composants UI génériques (`components/ui/`) des composants métier (`components/features/`). Ça facilite la réutilisation et les tests.
 
-#### 1. Séparation des Préoccupations
-- **UI Components** (`components/ui/`) : Composants réutilisables sans logique métier
-- **Feature Components** (`components/features/`) : Composants métier avec logique
-- **Services** : Logique d'appels API isolée
-- **Store** : État global centralisé
-- **Types** : Définitions TypeScript centralisées
+**Services isolés** : Toute la logique d'API est dans le dossier `services/`. Les composants ne font qu'appeler ces services, ce qui rend le code plus maintenable.
 
-#### 2. Component-Driven Development
-- Composants atomiques réutilisables (Button, Input, Card...)
-- Composition plutôt qu'héritage
-- Props typées avec TypeScript
-
-#### 3. State Management Strategy
-- **État global** : Authentification (Zustand + persist)
-- **État local** : UI states (loading, errors, forms)
-- **État serveur** : Données API gérées localement (pas de cache global)
-
-#### 4. Type Safety
-- TypeScript strict mode activé
-- Interfaces pour tous les modèles de données
-- Props typées pour tous les composants
-- Pas d'usage de `any`
+**Type safety** : Tous les modèles de données (User, TodoList, Todo) ont des interfaces TypeScript dans le dossier `types/`. Pas d'usage de `any` dans le projet.
 
 ---
 
-## 🎯 Fonctionnalités Implémentées
+## Fonctionnalités Implémentées
 
-### ✅ Features Requises (100%)
+### Features Requises ✅
 
 #### 1. Page de Connexion
-- [x] Formulaire email + mot de passe
-- [x] Validation (React Hook Form)
-- [x] Gestion des erreurs API
-- [x] Redirection après succès
-- [x] État de chargement (spinner dans bouton)
-- [x] Persistance de session (localStorage)
+- Formulaire email + mot de passe avec validation
+- Gestion des erreurs API avec messages clairs
+- Redirection automatique après connexion réussie
+- État de chargement (spinner dans le bouton)
+- Persistance de la session dans localStorage
 
 #### 2. Vue Principale - Listes & Tâches
-- [x] Affichage des listes de l'utilisateur connecté
-- [x] Affichage des tâches par liste
-- [x] Marquer une tâche comme complétée (avec checkbox)
-- [x] **Créer une nouvelle tâche** (feature principale)
-- [x] Supprimer une tâche
-- [x] Tri automatique (priorité + date)
-- [x] Affichage statistiques par liste (X/Y terminées)
+- Affichage des listes de l'utilisateur connecté
+- Affichage des tâches pour chaque liste
+- Marquer une tâche comme complétée (optimistic UI)
+- **Créer une nouvelle tâche** (feature principale)
+- Supprimer une tâche avec confirmation
+- Tri automatique par priorité et date
+- Statistiques par liste (X/Y tâches terminées)
 
 #### 3. Sidebar - Informations Utilisateur
-- [x] Avatar avec fallback (initiales)
-- [x] Nom et rôle de l'utilisateur
-- [x] Bouton de déconnexion
+- Avatar avec fallback sur les initiales
+- Nom complet et rôle de l'utilisateur
+- Bouton de déconnexion fonctionnel
 
-### ⚡ Features Bonus Implémentées
+### Features Bonus Ajoutées
 
-- [x] **Optimistic UI** : Mise à jour immédiate de l'UI avant confirmation serveur
-- [x] **Loading States** : Spinners et états de chargement partout
-- [x] **Error Handling** : Gestion gracieuse des erreurs avec rollback
-- [x] **Animations** : Transitions hover, loading, apparition
-- [x] **Responsive Design** : Grid adaptatif (mobile → desktop)
-- [x] **Validation Avancée** : 
-  - Date d'échéance dans le passé bloquée
-  - Validation longueur titre/description
-  - Pattern email strict
-- [x] **UX Polish** :
-  - Boutons d'action visibles au hover
-  - Confirmation avant suppression
-  - Auto-focus sur les inputs
-  - Indicateurs visuels de priorité et échéance
+**Optimistic UI** : L'interface se met à jour immédiatement quand on coche une tâche, sans attendre le serveur. Si l'API échoue, ça rollback automatiquement.
+
+**Notifications Toast** : J'ai ajouté un système de notifications qui s'affiche en haut à droite pour confirmer les actions (création, suppression, erreurs). Elles disparaissent automatiquement après 3 secondes.
+
+**Dialogues de Confirmation** : Une modale s'affiche avant de supprimer une tâche pour éviter les erreurs.
+
+**Animations (Framer Motion)** : J'ai intégré des animations fluides sur toute l'interface - transitions entre pages, apparitions progressives des éléments, effet hover sur les boutons. Ça rend l'application plus vivante sans ralentir les performances.
+
+**Validation des formulaires** : Les champs sont validés en temps réel avec des messages d'erreur clairs. Par exemple, on ne peut pas mettre une date d'échéance dans le passé.
+
+**Loading states et UX** : J'ai ajouté des spinners pendant les chargements, les boutons d'action apparaissent au survol, et l'interface s'adapte au mobile. Quand on crée une tâche, la liste se scroll automatiquement vers celle-ci.
 
 ---
 
-## 🎨 Choix UX & Design
+## Tests Implémentés
 
-### Design System
+J'ai ajouté des tests pour valider la feature principale (création de tâches).
 
-#### Palette de Couleurs
-- **Primaire** : Bleu (#3b82f6) - Actions principales
-- **Succès** : Vert - Priorité basse
-- **Warning** : Jaune - Priorité moyenne
-- **Danger** : Rouge - Priorité haute, suppressions
-- **Neutre** : Gris - Textes, backgrounds
+### Tests Unitaires (Vitest + React Testing Library)
 
-#### Composants UI
-- **Cohérence** : Tous les composants suivent le même design language
-- **Accessibilité** : States focus, aria-labels, sémantique HTML
-- **Feedback** : Hover states, loading states, error states
+**Fichier** : `src/components/features/todos/__tests__/TodoForm.test.tsx`
 
-### Patterns UX Appliqués
+- **Test 1** : Validation du formulaire (champs requis, messages d'erreur)
+- **Test 2** : Création réussie d'une tâche (remplissage + soumission)
 
-#### 1. Optimistic UI
-Mise à jour immédiate de l'interface avant la confirmation serveur :
-- ✅ Cocher une tâche : checkbox change instantanément
-- ❌ En cas d'erreur : rollback automatique + message d'erreur
-
-**Avantages :** Perception de rapidité, UX fluide
-
-#### 2. Loading States
-- Skeleton screens pendant le chargement initial
-- Spinners dans les boutons pendant les actions
-- Checkbox avec spinner pendant la mise à jour
-
-#### 3. Error Recovery
-- Messages d'erreur contextuels
-- Disparition automatique après 3 secondes
-- Possibilité de réessayer
-
-#### 4. Progressive Disclosure
-- Formulaire de création masqué par défaut
-- Bouton "+ Nouvelle tâche" pour l'afficher
-- Actions de modification/suppression visibles au hover
-
----
-
-## 🔒 Patterns Techniques Avancés
-
-### 1. Optimistic Updates with Rollback
-
-```typescript
-const handleToggleComplete = async () => {
-  const newState = !completed;
-  
-  // 1. Update UI immediately
-  setOptimisticCompleted(newState);
-  
-  try {
-    // 2. Call API
-    const updated = await todoService.updateTodo(id, { completed: newState });
-    onUpdate?.(updated);
-  } catch (err) {
-    // 3. Rollback on error
-    setOptimisticCompleted(!newState);
-    setError(err.message);
-  }
-};
-```
-
-### 2. Protected Routes
-
-```typescript
-function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, initialize } = useAuthStore();
-  
-  useEffect(() => initialize(), [initialize]);
-  
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  
-  return <>{children}</>;
-}
-```
-
-### 3. Persistent Authentication
-
-```typescript
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set) => ({ /* store logic */ }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({ user: state.user }),
-    }
-  )
-);
-```
-
----
-
-## 🚀 Améliorations Futures Envisagées
-
-### 1. Features (Ordre de Priorité)
-
-#### Priorité Haute
-- [ ] **Édition de tâches** : Ouvrir un formulaire pré-rempli pour modifier
-- [ ] **Filtres** : Tous / Complétés / En cours
-- [ ] **Recherche** : Filtrage en temps réel par titre/description
-
-#### Priorité Moyenne
-- [ ] **Gestion des listes** : Créer/Modifier/Supprimer des listes
-- [ ] **Statistiques utilisateur** : Dashboard avec graphiques
-- [ ] **Dark Mode** : Toggle light/dark avec persistance
-- [ ] **Notifications** : Toast notifications pour les actions
-
-#### Priorité Basse
-- [ ] **Drag & Drop** : Réorganiser les tâches
-- [ ] **Sous-tâches** : Tâches imbriquées
-- [ ] **Tags/Labels** : Catégorisation avancée
-- [ ] **Partage de listes** : Collaboration multi-utilisateurs
-
----
-
-### 2. Performance
-
-- [ ] **Lazy Loading** : React.lazy() pour les pages
-- [ ] **Virtualisation** : `react-window` pour grandes listes (>100 items)
-- [ ] **Memoization** : React.memo pour composants lourds
-- [ ] **Code Splitting** : Chunks par route
-- [ ] **Image Optimization** : WebP, lazy loading images
-
----
-
-### 3. Tests ✅ **IMPLÉMENTÉS**
-
-#### Tests Unitaires (Vitest + React Testing Library)
-
-**Fichier:** `src/components/features/todos/__tests__/TodoForm.test.tsx`
-
-```typescript
-✅ Test 1: Validation du formulaire
-- Vérifie que les champs requis sont validés
-- Teste les messages d'erreur
-- Vérifie l'état du bouton submit
-
-✅ Test 2: Création réussie d'une tâche
-- Remplit tous les champs du formulaire
-- Vérifie l'appel API avec les bonnes données
-- Vérifie le callback de succès
-```
-
-**Commandes:**
 ```bash
-npm test                  # Lancer les tests en mode watch
-npm test -- --run        # Lancer une seule fois (CI)
-npm run test:ui          # Interface UI interactive
-npm run test:coverage    # Rapport de couverture
+npm test              # Lancer en mode watch
+npm test -- --run     # Une seule fois
+npm run test:ui       # Interface interactive
 ```
 
-#### Test E2E (Playwright)
+### Test E2E (Playwright)
 
-**Fichier:** `e2e/todo-creation.spec.ts`
+**Fichier** : `e2e/todo-creation-simple.spec.ts`
 
-```typescript
-✅ Test: Flow complet de création de tâche
-- Login avec identifiants valides
-- Ouvrir le formulaire de création
-- Remplir tous les champs
-- Soumettre et vérifier la création
-- Marquer comme complétée
-- Supprimer la tâche
-```
+Test du flow complet :
+1. Login avec identifiants valides
+2. Ouverture du formulaire de création
+3. Remplissage de tous les champs
+4. Soumission et validation
 
-**Commandes:**
 ```bash
-npm run test:e2e         # Lancer les tests e2e
-npm run test:e2e:ui      # Mode interactif avec UI
+npm run test:e2e      # Lancer les tests
+npm run test:e2e:ui   # Mode interactif
 ```
 
-#### Couverture Actuelle
-- ✅ Feature principale (TodoForm): 100%
-- ⚠️ Composants UI: 0%
-- ⚠️ Services: 0%
-- ⚠️ Store: 0%
-
-**Documentation:** Voir `TESTS.md` pour plus de détails
-
-#### Technologies
-- **Vitest** - Framework de test rapide
-- **React Testing Library** - Tests comportementaux
-- **Playwright** - Tests e2e multi-navigateurs
-- **User Event** - Simulation d'interactions utilisateur
+**Note** : C'était ma première fois avec Playwright, la configuration m'a pris un moment mais une fois en place c'est vraiment puissant pour tester les flows utilisateurs.
 
 ---
 
-### 4. Qualité & DevOps
+## Défis Techniques Rencontrés
 
-- [ ] **ESLint** : Configuration stricte avec React/TypeScript rules
-- [ ] **Prettier** : Formatage automatique du code
-- [ ] **Husky** : Pre-commit hooks (lint + tests)
-- [ ] **CI/CD** : GitHub Actions pour tests + déploiement
-- [ ] **Sentry** : Error tracking en production
-- [ ] **Storybook** : Documentation des composants UI
+### 1. Optimistic UI avec Rollback
+Le plus intéressant à implémenter. J'ai dû :
+- Mettre à jour l'état local immédiatement (checkbox cochée)
+- Appeler l'API en arrière-plan
+- Gérer le rollback si l'API échoue
+- Afficher un message d'erreur temporaire
 
----
+C'était nouveau pour moi mais le résultat donne une UX vraiment fluide.
 
-### 5. Accessibilité (A11y)
+### 2. TypeScript Strict Mode
+Quelques galères avec les types, notamment :
+- Les props de React Router qui sont parfois complexes
+- Les types des événements de formulaire
+- L'intégration de `@testing-library/jest-dom` avec Vitest
 
-- [ ] Audit Lighthouse (cible 100%)
-- [ ] Navigation clavier complète
-- [ ] Screen reader testing
-- [ ] ARIA labels complets
-- [ ] Contraste couleurs (WCAG AAA)
+Mais globalement ça force à écrire du code plus robuste, donc je trouve que ça vaut le coup.
 
----
+### 3. Build pour Vercel
+Initialement, le build échouait car TypeScript compilait aussi les fichiers de tests. J'ai dû :
+- Modifier le script `build` pour exclure `tsc`
+- Laisser Vite gérer le type checking (plus rapide)
+- Créer un script `build:check` pour le type checking local
 
-### 6. Mobile
+### 4. Tests E2E avec Playwright
+La configuration de Playwright était nouvelle pour moi. J'ai appris à :
+- Configurer le serveur de développement pour les tests
+- Utiliser les sélecteurs de manière robuste
+- Gérer les états de chargement dans les tests
 
-- [ ] PWA : Service Worker + offline support
-- [ ] App mobile (React Native code sharing)
-- [ ] Notifications push
-- [ ] Gestures (swipe to delete)
+### 5. Système de Notifications Toast
+J'ai créé un système de toasts avec Context API et Portal React. L'idée est d'afficher les notifications au-dessus de tout le DOM. C'était un bon exercice pour comprendre les Portals.
 
----
-
-## 📊 Métriques de Performance
-
-### Build Stats
-- **Build time** : ~6.5s
-- **Bundle size** : 264KB (89KB gzipped)
-- **CSS size** : 18KB (4KB gzipped)
-
-### Lighthouse Score (estimé)
-- **Performance** : 95+
-- **Accessibility** : 90+
-- **Best Practices** : 95+
-- **SEO** : 90+
+### 6. Intégration Framer Motion
+Framer Motion s'intègre facilement. J'ai surtout utilisé les `motion` components et le stagger pour les listes. Le résultat est satisfaisant avec peu de code.
 
 ---
 
-## 🛠️ Debugging & Development
+## Retour d'Expérience
 
-### Variables d'Environnement
+### Ce que j'ai apprécié
 
-```env
-# .env.development
-VITE_API_URL=http://localhost:3001
+**Zustand** : Beaucoup plus simple que Redux, et le middleware `persist` fonctionne nickel.
 
-# .env.production
-VITE_API_URL=https://api.production.com
-```
+**React Hook Form** : La validation intégrée fait gagner beaucoup de temps.
 
-### DevTools Utiles
-- **React DevTools** : Inspection des composants
-- **Redux DevTools** : Compatible avec Zustand
-- **Network Tab** : Monitoring des appels API
+**Optimistic UI** : Je l'avais peu utilisé avant, mais le rendu immédiat améliore vraiment l'UX.
+
+### Ce que je ferais différemment
+
+Avec plus de temps, j'utiliserais **React Query** pour gérer le cache API et éviter de recharger les données. J'ajouterais aussi **Storybook** pour documenter les composants UI, et plus de tests sur les services.
 
 ---
 
-## 📚 Ressources & Documentation
+## Améliorations Futures
 
-### Documentation Externe
-- [React Docs](https://react.dev/)
+Avec plus de temps, j'ajouterais :
+- **Édition de tâches** : Pouvoir modifier une tâche existante
+- **Filtres et recherche** : Filtrer les tâches par statut ou rechercher par titre
+- **Gestion des listes** : Créer/modifier/supprimer ses propres listes
+- **Dark Mode** : Un thème sombre avec persistance
+- **Drag & Drop** : Réorganiser les tâches par glisser-déposer
+- **Lazy Loading** : Charger les pages à la demande pour améliorer les perfs
+- **CI/CD** : GitHub Actions pour automatiser les tests
+
+---
+
+## Configuration Vercel
+
+Le projet est prêt pour le déploiement sur Vercel.
+
+**Configuration automatique détectée** :
+- Framework : Vite
+- Build Command : `npm run build`
+- Output Directory : `dist`
+
+**Important** : L'API mock (json-server) ne sera pas déployée. Pour la production, il faudrait :
+- Déployer le backend séparément (Heroku, Railway, Render)
+- Configurer la variable d'environnement `VITE_API_URL`
+
+---
+
+## Métriques du Build
+
+**Taille du bundle** :
+- JavaScript : 265 KB (89 KB gzippé)
+- CSS : 18 KB (4 KB gzippé)
+- Total gzippé : ~94 KB
+
+**Performance** :
+- Build time : ~3s
+- Dev server startup : <1s
+- Hot reload : instantané
+
+---
+
+## Ressources Utilisées
+
+- [React Documentation](https://react.dev/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [TailwindCSS](https://tailwindcss.com/docs)
-- [Zustand](https://docs.pmnd.rs/zustand)
+- [TailwindCSS Docs](https://tailwindcss.com/docs)
+- [Zustand Documentation](https://docs.pmnd.rs/zustand)
 - [React Hook Form](https://react-hook-form.com/)
-
-### Conventions de Code
-- **Naming** : camelCase variables, PascalCase composants
-- **Files** : PascalCase.tsx pour composants
-- **Types** : Interfaces préfixées par le nom du modèle (ex: `TodoList`)
+- [Playwright](https://playwright.dev/)
 
 ---
 
-## 👤 Auteur & Contact
+## Informations Projet
 
-**Projet** : Wimi Frontend Test - Todo Manager  
-**Stack** : React + TypeScript + TailwindCSS + Zustand  
+**Durée de réalisation** : ~6 heures  
 **Date** : Janvier 2025  
-**Durée estimée** : 5-6 heures
+**Stack** : React + TypeScript + TailwindCSS + Zustand  
 
 ---
 
-## 📄 Licence
-
-Ce projet est réalisé dans le cadre d'un test technique pour Wimi.
-
----
-
-**Merci d'avoir pris le temps d'évaluer ce projet ! 🚀**
+Merci d'avoir pris le temps d'évaluer ce projet ! 🚀

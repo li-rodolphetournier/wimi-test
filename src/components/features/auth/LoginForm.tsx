@@ -2,8 +2,9 @@ import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Toast } from '@/components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface LoginFormData {
   email: string;
@@ -13,9 +14,13 @@ interface LoginFormData {
 export function LoginForm() {
   const navigate = useNavigate();
   const { login, isLoading, error, isAuthenticated, clearError } = useAuthStore();
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/dashboard');
+    if (isAuthenticated) {
+      setShowSuccessToast(true);
+      setTimeout(() => navigate('/dashboard'), 1000);
+    }
   }, [isAuthenticated, navigate]);
 
   const {
@@ -30,14 +35,26 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md mx-auto space-y-4">
-      <h1 className="text-2xl font-bold text-center mb-6">Connexion</h1>
+    <>
+      {showSuccessToast && (
+        <Toast
+          message="Connexion réussie ! Redirection en cours..."
+          type="success"
+          onClose={() => setShowSuccessToast(false)}
+        />
+      )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
+        <Toast
+          message={error}
+          type="error"
+          onClose={clearError}
+          duration={5000}
+        />
       )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <h2 className="text-xl font-semibold text-center text-gray-900 mb-6">Connexion</h2>
 
       <Input
         label="Email"
@@ -67,9 +84,10 @@ export function LoginForm() {
         error={errors.password?.message}
       />
 
-      <Button type="submit" isLoading={isLoading} className="w-full">
-        Se connecter
-      </Button>
-    </form>
+        <Button type="submit" isLoading={isLoading} className="w-full">
+          Se connecter
+        </Button>
+      </form>
+    </>
   );
 }

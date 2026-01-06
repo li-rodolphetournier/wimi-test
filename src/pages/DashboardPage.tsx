@@ -1,5 +1,7 @@
 import { useAuthStore } from '@/store/authStore';
 import { TodoList } from '@/components/features/todos/TodoList';
+import { PageTransition } from '@/components/ui/animations/PageTransition';
+import { FadeIn } from '@/components/ui/animations/FadeIn';
 
 /**
  * Page Dashboard - Page principale de l'application
@@ -13,11 +15,13 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Layout principal avec sidebar et contenu */}
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+    <PageTransition>
+      <div className="min-h-screen bg-gray-50">
+        {/* Layout principal avec sidebar et contenu */}
+        <div className="flex">
+          {/* Sidebar */}
+          <FadeIn delay={0.1}>
+            <aside className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
           <div className="p-6">
             {/* En-tête de la sidebar */}
             <div className="flex items-center justify-between mb-8">
@@ -69,16 +73,20 @@ export function DashboardPage() {
                 <span>Se déconnecter</span>
               </button>
             </div>
-          </div>
-        </aside>
+            </div>
+          </aside>
+          </FadeIn>
 
-        {/* Contenu principal */}
-        <main className="flex-1 p-8">
-          <div className="max-w-7xl mx-auto">
-            <TodoList />
-          </div>
-        </main>
+          {/* Contenu principal */}
+          <FadeIn delay={0.3}>
+            <main className="flex-1 p-8">
+              <div className="max-w-7xl mx-auto">
+                <TodoList />
+              </div>
+            </main>
+          </FadeIn>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }
