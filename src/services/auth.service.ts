@@ -19,7 +19,8 @@ export const authService = {
     }
 
     const user = response.data[0];
-    const { password: _, ...userWithoutPassword } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _pwd, ...userWithoutPassword } = user;
     
     return userWithoutPassword;
   },

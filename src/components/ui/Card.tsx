@@ -7,6 +7,7 @@ interface CardProps {
   shadow?: 'none' | 'sm' | 'md' | 'lg';
   border?: boolean;
   hover?: boolean;
+  id?: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export function Card({
   shadow = 'sm',
   border = true,
   hover = false,
+  id,
 }: CardProps) {
   // Classes de padding selon la prop
   const paddingClasses = {
@@ -38,6 +40,7 @@ export function Card({
 
   return (
     <div
+      id={id}
       className={`
         bg-white rounded-lg transition-all duration-200
         ${paddingClasses[padding]}

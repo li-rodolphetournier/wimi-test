@@ -1,0 +1,14 @@
+node_modules
+.cursor
+.vscode
+.idea
+playwright-report
+test-results
+coverage
+REFACTORING.md
+COMPLIANCE_CHECK.md
+TESTS.md
+README_TESTS.md
+*.log
+.DS_Store
+
