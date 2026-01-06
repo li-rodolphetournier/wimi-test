@@ -152,6 +152,7 @@ src/
 - Affichage des tâches pour chaque liste
 - Marquer une tâche comme complétée (optimistic UI)
 - **Créer une nouvelle tâche** (feature principale)
+- **Modifier une tâche existante** (tous les champs éditables)
 - Supprimer une tâche avec confirmation
 - Tri automatique par priorité et date
 - Statistiques par liste (X/Y tâches terminées)
@@ -166,6 +167,8 @@ src/
 **Optimistic UI** : L'interface se met à jour immédiatement quand on coche une tâche, sans attendre le serveur. Si l'API échoue, ça rollback automatiquement.
 
 **Notifications Toast** : J'ai ajouté un système de notifications qui s'affiche en haut à droite pour confirmer les actions (création, suppression, erreurs). Elles disparaissent automatiquement après 3 secondes.
+
+**Édition de Tâches** : Un modal d'édition permet de modifier tous les champs d'une tâche (titre, description, priorité, date). Le formulaire est pré-rempli avec les valeurs actuelles et valide en temps réel.
 
 **Dialogues de Confirmation** : Une modale s'affiche avant de supprimer une tâche pour éviter les erreurs.
 
@@ -271,7 +274,6 @@ Avec plus de temps, j'utiliserais **React Query** pour gérer le cache API et é
 ## Améliorations Futures
 
 Avec plus de temps, j'ajouterais :
-- **Édition de tâches** : Pouvoir modifier une tâche existante
 - **Filtres et recherche** : Filtrer les tâches par statut ou rechercher par titre
 - **Gestion des listes** : Créer/modifier/supprimer ses propres listes
 - **Dark Mode** : Un thème sombre avec persistance

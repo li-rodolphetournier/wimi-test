@@ -4,7 +4,7 @@ import { todoListService } from '@/services/todoList.service';
 import { todoService } from '@/services/todo.service';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Toast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/Toast';
 import { TodoItem } from './TodoItem';
 import { TodoForm } from './TodoForm';
 import { StaggerChildren, StaggerItem } from '@/components/ui/animations/StaggerChildren';
@@ -21,7 +21,8 @@ export function TodoList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [expandedLists, setExpandedLists] = useState<Record<number, boolean>>({});
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!user) return;
@@ -79,6 +80,13 @@ export function TodoList() {
     );
   };
 
+  const toggleExpandList = (listId: number) => {
+    setExpandedLists(prev => ({
+      ...prev,
+      [listId]: !prev[listId]
+    }));
+  };
+
   const handleTodoCreated = (newTodo: Todo) => {
     console.log('🎉 Nouvelle tâche créée:', newTodo);
     
@@ -122,9 +130,11 @@ export function TodoList() {
     
     setShowCreateForm(false);
     
-    // Afficher un message de succès
-    setSuccessMessage(`✅ Tâche "${newTodo.title}" créée avec succès !`);
-    setTimeout(() => setSuccessMessage(null), 3000);
+    // Afficher un toast de succès
+    showToast({
+      message: `✅ Tâche "${newTodo.title}" créée avec succès !`,
+      type: 'success',
+    });
     
     // Scroller vers la liste concernée
     setTimeout(() => {
@@ -212,14 +222,6 @@ export function TodoList() {
         </Button>
       </div>
 
-      {successMessage && (
-        <Toast
-          message={successMessage}
-          type="success"
-          onClose={() => setSuccessMessage(null)}
-        />
-      )}
-
       {showCreateForm && (
         <ScaleIn>
           <TodoForm
@@ -259,20 +261,28 @@ export function TodoList() {
                   Aucune tâche dans cette liste
                 </p>
               ) : (
-                list.todos.slice(0, 5).map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    onUpdate={(updatedTodo) => handleTodoUpdate(list.id, updatedTodo)}
-                    onDelete={(todoId) => handleTodoDelete(list.id, todoId)}
-                  />
-                ))
-              )}
+                <>
+                  {(expandedLists[list.id] ? list.todos : list.todos.slice(0, 5)).map((todo) => (
+                    <TodoItem
+                      key={todo.id}
+                      todo={todo}
+                      onUpdate={(updatedTodo) => handleTodoUpdate(list.id, updatedTodo)}
+                      onDelete={(todoId) => handleTodoDelete(list.id, todoId)}
+                    />
+                  ))}
 
-              {list.todos.length > 5 && (
-                <p className="text-xs text-gray-400 text-center py-2 border-t border-gray-100 pt-2 mt-2">
-                  +{list.todos.length - 5} autres tâches...
-                </p>
+                  {list.todos.length > 5 && (
+                    <button
+                      onClick={() => toggleExpandList(list.id)}
+                      className="w-full text-xs text-blue-600 hover:text-blue-800 font-medium text-center py-2 border-t border-gray-100 pt-2 mt-2 transition-colors hover:bg-blue-50 rounded"
+                    >
+                      {expandedLists[list.id] 
+                        ? '▲ Masquer les tâches' 
+                        : `▼ Voir ${list.todos.length - 5} autres tâches`
+                      }
+                    </button>
+                  )}
+                </>
               )}
             </div>
               </Card>

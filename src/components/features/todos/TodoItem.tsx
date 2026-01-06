@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { todoService } from '@/services/todo.service';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { TodoEditModal } from './TodoEditModal';
+import { useToast } from '@/components/ui/Toast';
 import type { Todo } from '@/types';
 
 interface TodoItemProps {
@@ -15,6 +17,8 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
   const [optimisticCompleted, setOptimisticCompleted] = useState(todo.completed);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const { showToast } = useToast();
 
   const handleToggleComplete = async () => {
     const newCompletedState = !optimisticCompleted;
@@ -32,6 +36,10 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
       setOptimisticCompleted(!newCompletedState);
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise à jour';
       setError(errorMessage);
+      showToast({
+        message: `❌ ${errorMessage}`,
+        type: 'error',
+      });
       setTimeout(() => setError(null), 3000);
     } finally {
       setIsUpdating(false);
@@ -48,11 +56,23 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
     try {
       await todoService.deleteTodo(todo.id);
       onDelete?.(todo.id);
+      showToast({
+        message: `🗑️ Tâche "${todo.title}" supprimée.`,
+        type: 'info',
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la suppression';
       setError(errorMessage);
+      showToast({
+        message: `❌ ${errorMessage}`,
+        type: 'error',
+      });
       setTimeout(() => setError(null), 3000);
     }
+  };
+
+  const handleTodoUpdated = (updatedTodo: Todo) => {
+    onUpdate?.(updatedTodo);
   };
 
   const formatDueDate = (dueDate: string) => {
@@ -95,6 +115,13 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
         type="danger"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setShowDeleteConfirm(false)}
+      />
+
+      <TodoEditModal
+        isOpen={showEditModal}
+        todo={todo}
+        onClose={() => setShowEditModal(false)}
+        onTodoUpdated={handleTodoUpdated}
       />
 
       <div className="group relative">
@@ -152,11 +179,20 @@ export function TodoItem({ todo, onUpdate, onDelete }: TodoItemProps) {
 
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
               <div className="flex space-x-1">
-                    <button
-                      className="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors"
-                      title="Supprimer"
-                      onClick={handleDeleteClick}
-                    >
+                <button
+                  className="p-1 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50 transition-colors"
+                  title="Modifier"
+                  onClick={() => setShowEditModal(true)}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button
+                  className="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50 transition-colors"
+                  title="Supprimer"
+                  onClick={handleDeleteClick}
+                >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
