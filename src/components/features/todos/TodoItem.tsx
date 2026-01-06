@@ -3,7 +3,7 @@ import { todoService } from '@/services/todo.service';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { TodoEditModal } from './TodoEditModal';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/ToastContext';
 import type { Todo } from '@/types';
 
 interface TodoItemProps {

@@ -1,6 +1,7 @@
-import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
+import { ToastContext } from './ToastContext';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -10,12 +11,6 @@ interface ToastMessage {
   type: ToastType;
   duration?: number;
 }
-
-interface ToastContextType {
-  showToast: (message: Omit<ToastMessage, 'id'>) => void;
-}
-
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -106,12 +101,4 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       )}
     </ToastContext.Provider>
   );
-}
-
-export function useToast() {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
 }

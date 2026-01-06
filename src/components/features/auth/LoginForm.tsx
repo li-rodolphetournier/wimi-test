@@ -2,10 +2,9 @@ import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { FadeIn } from '@/components/ui/animations';
 
 interface LoginFormData {
@@ -15,7 +14,7 @@ interface LoginFormData {
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const { login, isLoading, error, isAuthenticated, clearError } = useAuthStore();
+  const { login, isLoading, isAuthenticated, clearError } = useAuthStore();
   const { showToast } = useToast();
 
   useEffect(() => {

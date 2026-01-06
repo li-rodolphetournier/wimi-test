@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { todoService } from '@/services/todo.service';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/ToastContext';
 import type { Todo, UpdateTodoInput } from '@/types';
 import { motion } from 'framer-motion';
 

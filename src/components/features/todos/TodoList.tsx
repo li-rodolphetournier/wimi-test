@@ -4,7 +4,7 @@ import { todoListService } from '@/services/todoList.service';
 import { todoService } from '@/services/todo.service';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { useToast } from '@/components/ui/Toast';
+import { useToast } from '@/components/ui/ToastContext';
 import { TodoItem } from './TodoItem';
 import { TodoForm } from './TodoForm';
 import { StaggerChildren, StaggerItem } from '@/components/ui/animations/StaggerChildren';
@@ -88,11 +88,10 @@ export function TodoList() {
   };
 
   const handleTodoCreated = (newTodo: Todo) => {
-    console.log('🎉 Nouvelle tâche créée:', newTodo);
-    
     setListsWithTodos(prevLists => {
       const updatedLists = prevLists.map(list => {
-        if (list.id === newTodo.todoListId) {
+        // Convertir les deux IDs en number pour la comparaison (list.id peut être string)
+        if (Number(list.id) === Number(newTodo.todoListId)) {
           const updatedTodos = [newTodo, ...list.todos];
           
           // Trier les todos (priorité puis date)
@@ -109,8 +108,6 @@ export function TodoList() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
           });
           
-          console.log('✅ Liste mise à jour:', list.title, 'Total todos:', sortedTodos.length);
-          
           return { ...list, todos: sortedTodos };
         }
         return list;
@@ -119,8 +116,8 @@ export function TodoList() {
       // Remonter la liste qui vient de recevoir la nouvelle tâche en premier
       const sortedLists = [...updatedLists].sort((a, b) => {
         // La liste qui contient la nouvelle tâche passe en premier
-        if (a.id === newTodo.todoListId) return -1;
-        if (b.id === newTodo.todoListId) return 1;
+        if (Number(a.id) === Number(newTodo.todoListId)) return -1;
+        if (Number(b.id) === Number(newTodo.todoListId)) return 1;
         // Sinon garder l'ordre par date de création décroissante
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
