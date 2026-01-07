@@ -230,11 +230,11 @@ export function TodoList() {
       )}
 
       <StaggerChildren staggerDelay={0.1}>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-stretch">
           {listsWithTodos.map((list) => (
             <StaggerItem key={list.id}>
               <Card 
-                className="h-fit transition-all duration-300"
+                className="h-full flex flex-col transition-all duration-300"
                 id={`list-${list.id}`}
               >
             <div className="flex items-center space-x-3 mb-4">
